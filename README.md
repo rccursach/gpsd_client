@@ -1,8 +1,15 @@
 # GpsdClient
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/gpsd_client`. To experiment with that code, run `bin/console` for an interactive prompt.
+A simple GPSd client intended for use on the Raspberry Pi.
 
-TODO: Delete this and the text above, and describe your gem
+Actually only implements new(), new('hostname', port) start(), stop(), and get_position() which are just a few but very simple methods.
+
+* Next days will fix some non fatal bugs. (like actually closing the socket on stop())
+* Next version will implement fix_status(), time(), speed() and altitude().
+* Next Next will clean-up the code.
+* The Next after the Next will add some documentation.
+
+Stay Tuned!
 
 ## Installation
 
