@@ -2,12 +2,14 @@
 
 A simple GPSd client intended for use on the Raspberry Pi.
 
-Actually only implements new(), new('hostname', port) start(), stop(), and get_position() which are just a few but very simple methods.
+Actually only implements new(options = {}), start(), stop(), and get_position() which are just a few but very simple methods.
+(See Usage)
+
 
 * Next days will fix some non fatal bugs. (like actually closing the socket on stop())
 * Next version will implement fix_status(), time(), speed() and altitude().
 * Next Next will clean-up the code.
-* The Next after the Next will add some documentation.
+* The Next after the Next-Next will add some documentation.
 
 Stay Tuned!
 
@@ -30,6 +32,10 @@ Or install it yourself as:
 ## Usage
 
 ```ruby
+# you can specify the host and port for remotes machines or different ports
+# ...or not. (defaults to "localhost", 2947)
+
+# gpsd = GpsdClient::Gpsd.new({:host => "nameofthehost", :port => 2947})
 gpsd = GpsdClient::Gpsd.new()
 gpsd.start()
 
