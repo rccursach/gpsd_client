@@ -22,7 +22,19 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+```ruby
+gpsd = GpsdClient::Gpsd.new()
+gpsd.start()
+
+if gpsd.started?
+  pos = gpsd.get_position
+  # => {:lat => xx, :lon => xx}
+end
+
+# To stop polling the daemon
+gpsd.stop()
+# Actually Gpsd.stop() doesn't close the connection socket (to be fixed)
+```
 
 ## Development
 
