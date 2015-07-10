@@ -60,14 +60,13 @@ module GpsdClient
                 # http://www.catb.org/gpsd/client-howto.html
                 # mode 1 means no valid data
                 # return "Lat: #{line['lat'].to_s}, Lon: #{line['lon'].to_s}" unless line['mode'] == 1
-                return {lat: line['lat'], lon: line['lon']} unless line['mode'] == 1
+                return {lat: line['lat'], lon: line['lon'], time: line['time'], speed: line['speed'], altitude: line['alt']} unless line['mode'] == 1
             end
             
             reads = reads + 1
         
         end
-        
-        return {lat: nil, lon: nil}
+        return {lat: nil, lon: nil, time: nil, speed: nil, altitude: nil } unless line['mode'] == 1
     end
     
     private
