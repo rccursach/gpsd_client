@@ -2,16 +2,12 @@
 
 A simple GPSd client intended for use on the Raspberry Pi.
 
-Actually only implements new(options = {}), start(), stop(), and get_position() which are just a few but very simple methods.
+Provides four simple methods to communicate with GPSd: `new(options = {})`, `start()`, `stop()`, and `get_position()`.
 (See Usage)
 
+* Next version will implement fix_status().
+* The Next-Next will add some documentation.
 
-* Next days will fix some non fatal bugs. (like actually closing the socket on stop())
-* Next version will implement fix_status(), time(), speed() and altitude().
-* Next Next will clean-up the code.
-* The Next after the Next-Next will add some documentation.
-
-Stay Tuned!
 
 ## Installation
 
@@ -23,7 +19,7 @@ gem 'gpsd_client'
 
 And then execute:
 
-    $ bundle
+    $ bundle install
 
 Or install it yourself as:
 
