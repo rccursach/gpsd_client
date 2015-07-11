@@ -1,5 +1,5 @@
 require 'spec_helper'
-
+require 'json'
 gpsd = GpsdClient::Gpsd.new()
 
 describe GpsdClient do
@@ -8,14 +8,15 @@ describe GpsdClient do
   end
 
   it 'gets my position' do
-    pos = gpsd.started? ? gpsd.get_position : nil
-    puts "Position : #{pos.nil? ? 'nil' : pos.to_s}"
-    if pos.is_a? Hash
-      if pos[:lat].nil? then puts "Still waiting a fix from GPS." end
-    end
+    pos = gpsd.get_position
+    puts pos.to_json.to_s
     expect(pos).to be_a Hash
+  end
+
+  it 'closes conection' do
+    expect(gpsd.stop()).to eq(true)
   end
 end
 
-gpsd.stop()
+#gpsd.stop()
 
