@@ -57,8 +57,8 @@ module GpsdClient
             line = ""
             begin
                 @socket.puts '?WATCH={"enable":true};'
+                sleep 0.1
                 @socket.puts "?POLL;"
-                sleep 1
                 line = @socket.gets
             rescue Exception => ex
                 puts "Error while reading Socket: #{ex.message}"
@@ -82,7 +82,7 @@ module GpsdClient
             reads = reads + 1
         
         end
-        puts "TPV not found polling on GPSd"
+        #puts "debug >> TPV not found polling on GPSd"
         return empty_hash
     end
     
