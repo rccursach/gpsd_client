@@ -42,7 +42,6 @@ end
 
 # To stop polling the daemon
 gpsd.stop()
-# Actually Gpsd.stop() doesn't close the connection socket (to be fixed)
 ```
 
 ## Development
