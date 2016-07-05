@@ -35,11 +35,11 @@ module GpsdClient
         end
         return @started
     end
-    
+
     def started?
         @started
     end
-    
+
     def stop
         return not_started_msg("Gpsd.stop") if not self.started?
         @socket.puts '?WATCH={"enable":false};'
@@ -47,12 +47,12 @@ module GpsdClient
         @started = false if @socket.closed?
         !self.started?
     end
-    
+
     def get_position
         reads = 0
         empty_hash =  {lat: nil, lon: nil, time: nil, speed: nil, altitude: nil }
         return empty_hash if not self.started?
-        
+
         while reads < 10 do # Skip VERSION SKY WATCH or DEVICES response
             line = ""
             begin
@@ -63,7 +63,7 @@ module GpsdClient
             rescue Exception => ex
                 puts "Error while reading Socket: #{ex.message}"
             end
-        
+
             # Parse line, return empty string on fail
             # if parsed, extract ptv Hash from the JSON report polled
             line = JSON.parse(line) rescue ''
@@ -78,20 +78,20 @@ module GpsdClient
                 # return "Lat: #{line['lat'].to_s}, Lon: #{line['lon'].to_s}" unless line['mode'] == 1
                 return {lat: line['lat'], lon: line['lon'], time: line['time'], speed: line['speed'], altitude: line['alt']} unless line['mode'] == 1
             end
-            
+
             reads = reads + 1
-        
+
         end
         #puts "debug >> TPV not found polling on GPSd"
         return empty_hash
     end
-    
+
     private
-    
+
     def not_started_msg( method = 'Gpsd' )
         puts "#{method}: No socket connection started"
         return nil
     end
-    
+
   end
 end
