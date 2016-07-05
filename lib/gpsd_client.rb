@@ -25,9 +25,10 @@ module GpsdClient
                   #@socket.puts '?WATCH={"enable":true,"json":true}' # disabled reporting, instead we are polling
                   @socket.puts '?WATCH={"enable":true};'
                   @started = true
+                  flush_socket
                 end
 
-            rescue Exception => ex
+            rescue => ex
                 puts 'Some error happen starting socket connection:'
                 puts ex.message
                 self.stop
@@ -49,23 +50,26 @@ module GpsdClient
     end
 
     def get_position
-        reads = 0
         empty_hash =  {lat: nil, lon: nil, time: nil, speed: nil, altitude: nil }
         return empty_hash if not self.started?
-
-        while reads < 10 do # Skip VERSION SKY WATCH or DEVICES response
-            line = ""
-            begin
-                @socket.puts '?WATCH={"enable":true};'
-                sleep 0.1
-                @socket.puts "?POLL;"
-                line = @socket.gets
-            rescue Exception => ex
-                puts "Error while reading Socket: #{ex.message}"
+        begin
+            @socket.puts "?POLL;"
+            retries = 0
+            until retries == 10 do
+                begin
+                    lines = @socket.read_nonblock(4096).split("\r\n")
+                rescue IO::EAGAINWaitReadable
+                    retries += 1
+                    sleep 0.1*retries
+                end
             end
+        rescue => ex
+            puts "Error while reading Socket: #{ex.message}"
+        end
 
-            # Parse line, return empty string on fail
-            # if parsed, extract ptv Hash from the JSON report polled
+        # Parse line, return empty string on fail
+        # if parsed, extract ptv Hash from the JSON report polled
+        lines.each do |line|
             line = JSON.parse(line) rescue ''
             if line.is_a? Hash and line['tpv'].is_a? Array
               #puts "debug >> #{line.to_json.to_s}"
@@ -76,13 +80,11 @@ module GpsdClient
                 # http://www.catb.org/gpsd/client-howto.html
                 # mode 1 means no valid data
                 # return "Lat: #{line['lat'].to_s}, Lon: #{line['lon'].to_s}" unless line['mode'] == 1
+                flush_socket
                 return {lat: line['lat'], lon: line['lon'], time: line['time'], speed: line['speed'], altitude: line['alt']} unless line['mode'] == 1
             end
-
-            reads = reads + 1
-
+            #puts "debug >> TPV not found polling on GPSd"
         end
-        #puts "debug >> TPV not found polling on GPSd"
         return empty_hash
     end
 
@@ -93,5 +95,17 @@ module GpsdClient
         return nil
     end
 
+    # Reads from socket until no more data is returned, the read data will be thrown away.
+    # Params:
+    # +socket+:: the socket to read from
+    def flush_socket
+        begin
+            loop do
+                @socket.read_nonblock(1024)
+            end
+        rescue IO::EAGAINWaitReadable
+            true
+        end
+    end
   end
 end
