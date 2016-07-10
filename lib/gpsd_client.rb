@@ -4,6 +4,10 @@ require "socket"
 require "json"
 
 module GpsdClient
+  
+  if ! ::IO.const_defined?(:EAGAINWaitReadable)
+    class ::IO::EAGAINWaitReadable; end
+  end
 
   class Gpsd
     attr_reader :host, :port
@@ -11,7 +15,7 @@ module GpsdClient
     @started = false
 
     def initialize(options = {})
-        @host = options[:host] ||= 'localhost'
+        @host = options[:host] ||= '127.0.0.1'
         @port = options[:port] ||= 2947
     end
 
@@ -22,7 +26,6 @@ module GpsdClient
                 @socket.puts 'w+'
                 line = JSON.parse @socket.gets rescue ''
                 if line.is_a? Hash and line['class'] == 'VERSION'
-                  #@socket.puts '?WATCH={"enable":true,"json":true}' # disabled reporting, instead we are polling
                   @socket.puts '?WATCH={"enable":true};'
                   @started = true
                   flush_socket
@@ -58,7 +61,7 @@ module GpsdClient
             until retries == 10 do
                 begin
                     lines = @socket.read_nonblock(4096).split("\r\n")
-                rescue IO::EAGAINWaitReadable
+                rescue IO::WaitReadable, IO::EAGAINWaitReadable
                     retries += 1
                     sleep 0.1*retries
                 end
@@ -103,7 +106,7 @@ module GpsdClient
             loop do
                 @socket.read_nonblock(1024)
             end
-        rescue IO::EAGAINWaitReadable
+        rescue IO::WaitReadable, IO::EAGAINWaitReadable
             true
         end
     end
